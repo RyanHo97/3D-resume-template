@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Blog</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #blog {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            font-size: 48px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        #resume {
+            position: absolute;
+            width: 600px;
+            height: auto;
+            margin: 0 auto;
+            left: calc(50% - 300px);
+            top: 30vh;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
+            transform: skew(-2deg, -2deg) rotateX(10deg);
+        }
+
+        #button {
+            position: absolute;
+            right: 20px;
+            bottom: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* Styles for mobile devices */
+        @media (max-width: 767px) {
+            #blog {
+                font-size: 36px;
+                left: 10px;
+                top: 10px;
+            }
+
+            #button {
+                font-size: 24px;
+                padding: 12px 24px;
+                right: 10px;
+                bottom: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="blog">Ryanho97-Blog</div>
+    <div id="resume">
+        <p style="color:white;display: none;">你好，我是Ryanho97，欢迎来到我的个人博客，您可以享受在此学习的乐趣。</p>
+        <p style="color:white;display: none;">个人介绍：我拥有5年工作经验，熟练掌握前端技能，热爱性能优化领域。</p>
+        <p style="color:white;display: none;">我具备良好的团队合作能力和沟通能力，热衷分享技术领域研究成果。</p>
+        <p style="color:white;display: none;">技术栈：Vue、React、Jquery、Javascript、HTML、CSS、Vite、Webpack、Rspack、canvas、threejs</p>
+    </div>
+    <button id="button">Get Started</button>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.135.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three/examples/js/loaders/GLTFLoader.js"></script>
+    <script>
+        window.addEventListener('load', function () {
+            // Adjust camera for mobile devices
+            if (/Mobi/i.test(navigator.userAgent)) {
+                camera.position.z = 15;
+                camera.fov = 70;
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+            }
+
+            // Set renderer size for mobile devices
+            if (window.innerWidth < 768) {
+                renderer.setSize(window.innerWidth, window.innerHeight / 2);
+            }
+        });
+
+        // Set up the scene and camera
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(100, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const clock = new THREE.Clock();
+        camera.position.z = 5;
+
+        // Load the GLTF model and add it to the scene
+        const loader = new THREE.GLTFLoader();
+        loader.load('path/scene.gltf', function (gltf) {
+            const model = gltf.scene;
+            const delta = clock.getDelta();
+            const angle = delta * 0.5;
+            model.scale.set(50, 30, 60); // Scale the model up
+            model.position.set(0, 0, 0); // Move the model down
+
+            // Create a parent object and add the model to it
+            const parent = new THREE.Object3D();
+            parent.add(model);
+
+            // Set the pivot point of the parent object to the desired location
+            parent.position.set(0, -60, 0);
+
+            // Add the parent object to the scene
+            scene.add(parent);
+
+            // Rotate the parent object instead of the model
+            parent.rotation.y += angle;
+        });
+
+        // Set up the renderer and add it to the DOM
+        const renderer = new THREE.WebGLRenderer({
+            antialias: true
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Add event listener to resize renderer with window
+        window.addEventListener('resize', function () {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+        });
+
+        // Set up animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+            const time = Date.now() * 0.001;
+
+            // Rotate the parent object instead of the scene
+            scene.rotation.y = 1.2 * time;
+        }
+        animate();
+
+        // Add event listener to button
+        const button = document.getElementById('button');
+        button.addEventListener('click', function () {
+            // Do something when the button is clicked
+            window.location.href = 'http://rfly.site/blog/blog.html';
+        });
+    </script>
+
+    <script>
+        const typewriter = document.getElementById("resume");
+        const paragraphs = typewriter.getElementsByTagName("p");
+        let index = 0;
+        let offset = 0;
+        let maxOffset = 0;
+        let isNewLine = true;
+        const lastParagraphIndex = paragraphs.length - 1;
+
+        function textAnimate() {
+            if (index > lastParagraphIndex) {
+                // 动画结束
+                return;
+            }
+
+            const paragraph = paragraphs[index];
+            if (offset < paragraph.textContent.length) {
+                if (isNewLine) {
+                    const newLine = document.createElement("p");
+                    newLine.style.color = "white";
+                    typewriter.appendChild(newLine);
+                    isNewLine = false;
+                }
+                const currentLine = typewriter.lastChild;
+                if (currentLine.textContent.length === 0) {
+                    currentLine.style.opacity = 1;
+                }
+                currentLine.textContent += paragraph.textContent[offset];
+                offset++;
+            } else {
+                index++;
+                offset = 0;
+                maxOffset = 0;
+                isNewLine = true;
+            }
+
+            maxOffset = Math.max(maxOffset, offset);
+            typewriter.style.height = `${paragraphs[0].clientHeight * (maxOffset + 1)}px`;
+
+            // 递归调用
+            if (index <= lastParagraphIndex) {
+                requestAnimationFrame(textAnimate);
+            }
+        }
+
+        // 初始化
+        for (let i = 0; i < paragraphs.length; i++) {
+            const paragraph = paragraphs[i];
+            paragraph.style.opacity = 0;
+        }
+
+        textAnimate();
+    </script>
+</body>
+
+</html>
